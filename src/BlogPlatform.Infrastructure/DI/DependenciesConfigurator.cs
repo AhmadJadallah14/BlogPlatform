@@ -1,13 +1,26 @@
-﻿using BlogPlatform.Application.Common;
-using BlogPlatform.Infrastructure.Interface.Auth;
+﻿using BlogPlatform.API.Options;
+using BlogPlatform.Application.Common;
+
+using BlogPlatform.Application.Interfaces.FileStorge;
+using BlogPlatform.Application.Interfaces.Repo;
+
+using BlogPlatform.Infrastructure.FileStorge;
 using BlogPlatform.Infrastructure.Interface;
+using BlogPlatform.Infrastructure.Interface.Auth;
+using BlogPlatform.Infrastructure.Repositories;
 using BlogPlatform.Infrastructure.Seed.Identity;
+
 using FluentValidation;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using Microsoft.AspNetCore.Builder;
+
 using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -15,15 +28,6 @@ namespace BlogPlatform.Infrastructure.DI
 {
     public static class DependenciesConfigurator
     {
-        public static void ConfigureAppLogging(this IApplicationBuilder app, IConfiguration configuration)
-        {
-        }
-
-        public static void ConfigureInfrastructure(this IApplicationBuilder app)
-        {
-        }
-
-
         public static async Task SeedRolesAsync(this IApplicationBuilder app)
         {
             using var scope = app.ApplicationServices.CreateScope();
@@ -34,6 +38,7 @@ namespace BlogPlatform.Infrastructure.DI
         public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDataBaseServices(configuration);
+            services.AddOptions(configuration);
             services.AddBuildingBlocks(configuration);
             services.AddInfrastructureCore(configuration);
             services.AddLoggingServices(configuration);
@@ -43,7 +48,6 @@ namespace BlogPlatform.Infrastructure.DI
             services.AddLocalizationServices(configuration);
             services.AddUtilityServices(configuration);
             services.AddNotificationServices(configuration);
-            services.AddJwtTokenService(configuration);
             services.AddEventBusAndHandlers(configuration);
             services.AddSignalRServices(configuration);
             services.AddHangFireJobs(configuration);
@@ -55,31 +59,12 @@ namespace BlogPlatform.Infrastructure.DI
             services.AddDbContext<BlogPlatformContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
         }
-        private static void AddJwtTokenService(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                     .AddJwtBearer(options =>
-                     {
-                         options.TokenValidationParameters = new TokenValidationParameters
-                         {
-                             ValidateIssuer = true,
-                             ValidateAudience = true,
-                             ValidateLifetime = true,
-                             ValidateIssuerSigningKey = true,
-                             ValidIssuer = configuration["Jwt:Issuer"],
-                             ValidAudience = configuration["Jwt:Audience"],
-                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
-                         };
-                     });
-        }
-
         private static void AddFluentValidation(this IServiceCollection services)
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             services.AddValidatorsFromAssemblies(assemblies);
         }
-
         private static void AddMediatR(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddMediatR(cfg =>
@@ -93,6 +78,14 @@ namespace BlogPlatform.Infrastructure.DI
         private static void AddInfrastructureCore(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<IFileStorageService, FileStorageService>();
+
+        }
+        private static void AddOptions(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<JwtOptions>(options => configuration.GetSection("Jwt").Bind(options));
 
         }
 
