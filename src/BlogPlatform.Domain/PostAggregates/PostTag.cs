@@ -8,5 +8,15 @@
 
         public int TagId { get; set; }
         public Tag Tag { get; set; }
+        public PostTag() { }
+
+        public PostTag(Post post, Tag tag)
+        {
+            Post = post;
+            PostId = post.Id;
+            Tag = tag;
+            TagId = tag.Id;
+        }
+
     }
 }
