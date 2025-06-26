@@ -34,6 +34,7 @@ namespace BlogPlatform.Infrastructure.DI
             var services = scope.ServiceProvider;
 
             await RoleSeeder.SeedRolesAsync(services);
+            await UserSeeder.SeedAdminUserAsync(services);
         }
         public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -80,6 +81,7 @@ namespace BlogPlatform.Infrastructure.DI
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IFileStorageService, FileStorageService>();
 
         }

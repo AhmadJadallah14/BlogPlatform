@@ -1,8 +1,10 @@
 using BlogPlatform.API.DI;
 using BlogPlatform.API.Options;
+using BlogPlatform.Application.Behaviors;
 using BlogPlatform.Domain.ApplicationUserAggregate;
 using BlogPlatform.Infrastructure;
 using BlogPlatform.Infrastructure.DI;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -64,6 +66,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
     options.ClaimsIdentity.RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
 });
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 
 builder.Services.AddControllers();

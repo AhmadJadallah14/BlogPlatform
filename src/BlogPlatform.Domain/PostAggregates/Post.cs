@@ -52,7 +52,6 @@ namespace BlogPlatform.Domain.PostAggregates
 
             return post;
         }
-
         public void UpdateTitle(string title) => Title = title;
         public void UpdateBody(string body) => Body = body;
         public void UpdateCoverImageUrl(string url) => CoverImageUrl = url;
@@ -61,7 +60,10 @@ namespace BlogPlatform.Domain.PostAggregates
         public void SetUpdatedBy(string userId) => UpdatedBy = userId;
         public void SetUpdatedOn(DateTime date) => UpdateOn = date;
         public void SoftDelete() => IsDeleted = true;
-
+        public void SetPublishStatus(bool isPublished)
+        {
+            IsPublished = isPublished;
+        }
         public void AddTags(List<Tag> tags)
         {
             foreach (var tag in tags)

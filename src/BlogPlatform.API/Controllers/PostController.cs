@@ -58,5 +58,22 @@ namespace BlogPlatform.API.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("GetAllPosts")]
+        [Authorize(Roles = nameof(RolesEnum.Admin))]
+        public async Task<IActionResult> GetAllPosts([FromBody] GetAllPostsQuery query)
+        {
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpPut("{postId}/publish")]
+        [Authorize(Roles = nameof(RolesEnum.Admin))]
+        public async Task<IActionResult> PublishPost(int postId)
+        {
+            var command = new PublishPostCommand(postId,true);
+            var result = await _mediator.Send(command);
+            return result.Succeeded ? Ok(result) : BadRequest(result);
+        }
     }
 }

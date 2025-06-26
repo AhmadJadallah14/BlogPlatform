@@ -10,5 +10,11 @@ namespace BlogPlatform.Application.Interfaces.Repo
         Task UpdateAsync(Post post, CancellationToken cancellationToken);
         Task<List<Post>> GetPostsByAuthorAsync(string authorId, int pageIndex, int pageSize, CancellationToken cancellationToken);
         Task<int> CountByAuthorAsync(string authorId, CancellationToken cancellationToken);
-    }   
+        Task<int> CountAllAsync(CancellationToken cancellationToken);
+        Task<int> CountPublishedAsync(CancellationToken cancellationToken);
+        Task<(List<Post> Posts, int TotalCount)> GetAllPagedAsync(string authorId, bool? isPublished, int pageIndex, int pageSize, CancellationToken cancellationToken);
+        Task<(int TotalCount, List<Post> Posts)> GetPublishedPostsWithCountAsync(string tag, string term, string authorId, int pageIndex, int pageSize,
+            CancellationToken cancellationToken);
+        Task<Post> GetBySlugAsync(string slug, CancellationToken cancellationToken);
+    }
 }

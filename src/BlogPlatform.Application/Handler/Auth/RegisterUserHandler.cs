@@ -22,7 +22,8 @@ namespace BlogPlatform.Application.Handler.Auth
             var user = new ApplicationUser
             {
                 UserName = request.UserName,
-                Email = request.Email
+                Email = request.Email,
+                CreatedOn = DateTime.UtcNow,
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
