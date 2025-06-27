@@ -75,5 +75,13 @@ namespace BlogPlatform.API.Controllers
             var result = await _mediator.Send(command);
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
+
+        [HttpGet("GetPostById/{postId}")]
+        [Authorize(Roles = nameof(RolesEnum.Author) + "," + nameof(RolesEnum.Admin))]
+        public async Task<IActionResult> GetPostById(int postId)
+        {
+            var result = await _mediator.Send(new GetPostByPostIdQuery { PostId = postId });
+            return result.Succeeded ? Ok(result) : NotFound(result);
+        }
     }
 }

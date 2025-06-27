@@ -40,7 +40,7 @@ namespace BlogPlatform.Application.Handler.Post
                 IsPublished = post.IsPublished,
                 CreatedOn = post.CreatedOn,
                 Tags = post.PostTags.Select(pt => pt.Tag.Name).ToList(),
-                CoverImageUrl = $"{baseUrl}/uploads/{post.CoverImageUrl}"
+                CoverImageUrl = $"{baseUrl}{post.CoverImageUrl}"
             }).ToList();
 
             return new PagedResult<PostResponseDto>(items, totalCount, request.PageIndex, request.PageSize);
