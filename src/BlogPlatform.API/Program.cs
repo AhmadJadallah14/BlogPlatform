@@ -76,12 +76,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDev", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:4200","https://blog.izzjo.com")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
-
 
 var app = builder.Build();
 
