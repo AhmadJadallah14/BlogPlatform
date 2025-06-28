@@ -1,5 +1,4 @@
 ﻿using BlogPlatform.Application.Common;
-using BlogPlatform.Application.DTOs.Post;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -14,6 +13,6 @@ namespace BlogPlatform.Application.Command.Post
 
         public CreatePostCommand() { }
 
-       
+
     }
 }
