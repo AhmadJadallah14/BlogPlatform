@@ -15,7 +15,11 @@ namespace BlogPlatform.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
         {
+
             var result = await _mediator.Send(command);
+            if (!result.Succeeded)
+                return BadRequest(result);
+
             return Ok(result);
         }
 

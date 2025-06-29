@@ -1,4 +1,5 @@
 ﻿using BlogPlatform.Application.Command.Auth;
+using BlogPlatform.Application.Common;
 using BlogPlatform.Application.DTOs.Auth;
 using BlogPlatform.Domain.ApplicationUserAggregate;
 using MediatR;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BlogPlatform.Application.Handler.Auth
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, RegisterUserResultDto>
+    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, Result<RegisterUserResultDto>>
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -17,8 +18,14 @@ namespace BlogPlatform.Application.Handler.Auth
             _roleManager = roleManager;
         }
 
-        public async Task<RegisterUserResultDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<RegisterUserResultDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                return Result<RegisterUserResultDto>.Failure("Email is already registered.");
+            }
+
             var user = new ApplicationUser
             {
                 UserName = request.UserName,
@@ -30,8 +37,8 @@ namespace BlogPlatform.Application.Handler.Auth
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new ApplicationException($"Registration failed: {errors}");
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                return Result<RegisterUserResultDto>.Failure(errors);
             }
 
             if (await _roleManager.RoleExistsAsync("Author"))
@@ -39,12 +46,15 @@ namespace BlogPlatform.Application.Handler.Auth
                 await _userManager.AddToRoleAsync(user, "Author");
             }
 
-            return new RegisterUserResultDto
+            var dto = new RegisterUserResultDto
             {
                 UserId = user.Id,
                 UserName = user.UserName,
                 Email = user.Email
             };
+
+            return Result<RegisterUserResultDto>.Success(dto);
         }
     }
 }
+
